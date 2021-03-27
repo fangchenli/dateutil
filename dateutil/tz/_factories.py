@@ -1,18 +1,17 @@
 from datetime import timedelta
 import weakref
 from collections import OrderedDict
-
-from six.moves import _thread
+from _thread import allocate_lock
 
 
 class _TzSingleton(type):
     def __init__(cls, *args, **kwargs):
         cls.__instance = None
-        super(_TzSingleton, cls).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __call__(cls):
         if cls.__instance is None:
-            cls.__instance = super(_TzSingleton, cls).__call__()
+            cls.__instance = super().__call__()
         return cls.__instance
 
 
@@ -28,7 +27,7 @@ class _TzOffsetFactory(_TzFactory):
         cls.__strong_cache = OrderedDict()
         cls.__strong_cache_size = 8
 
-        cls._cache_lock = _thread.allocate_lock()
+        cls._cache_lock = allocate_lock()
 
     def __call__(cls, name, offset):
         if isinstance(offset, timedelta):
@@ -58,7 +57,7 @@ class _TzStrFactory(_TzFactory):
         cls.__strong_cache = OrderedDict()
         cls.__strong_cache_size = 8
 
-        cls.__cache_lock = _thread.allocate_lock()
+        cls.__cache_lock = allocate_lock()
 
     def __call__(cls, s, posix_offset=False):
         key = (s, posix_offset)

@@ -16,8 +16,8 @@ def pytest_collection_modifyitems(items):
 
         # Need to query the args because conditional xfail tests still have
         # the xfail mark even if they are not expected to fail
-        if marker and (not marker.args or marker.args[0]):
-            item.add_marker(pytest.mark.no_cover)
+        # if marker and (not marker.args or marker.args[0]):
+        #     item.add_marker(pytest.mark.no_cover)
 
 
 def set_tzpath():
@@ -31,7 +31,7 @@ def set_tzpath():
 
     path_components = tzpath.split(':')
 
-    print("Setting TZPATH to {}".format(path_components))
+    print(f"Setting TZPATH to {path_components}")
 
     from dateutil import tz
     tz.TZPATHS.clear()

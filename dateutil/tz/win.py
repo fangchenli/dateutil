@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module provides an interface to the native time zone data on Windows,
 including :py:class:`datetime.tzinfo` implementations.
@@ -10,12 +9,10 @@ Attempting to import this module on a non-Windows platform will raise an
 import datetime
 import struct
 
-from six.moves import winreg
-from six import text_type
-
 try:
     import ctypes
     from ctypes import wintypes
+    import winreg
 except ValueError:
     # ValueError is raised on non-Windows systems for some horrible reason.
     raise ImportError("Running tzwin on non-Windows system")
@@ -36,7 +33,7 @@ def _settzkeyname():
     try:
         winreg.OpenKey(handle, TZKEYNAMENT).Close()
         TZKEYNAME = TZKEYNAMENT
-    except WindowsError:
+    except OSError:
         TZKEYNAME = TZKEYNAME9X
     handle.Close()
     return TZKEYNAME
@@ -45,7 +42,7 @@ def _settzkeyname():
 TZKEYNAME = _settzkeyname()
 
 
-class tzres(object):
+class tzres:
     """
     Class for accessing ``tzres.dll``, which contains timezone name related
     resources.
@@ -216,7 +213,7 @@ class tzwin(tzwinbase):
         self._name = name
 
         with winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE) as handle:
-            tzkeyname = text_type("{kn}\\{name}").format(kn=TZKEYNAME, name=name)
+            tzkeyname = f"{TZKEYNAME}\\{name}"
             with winreg.OpenKey(handle, tzkeyname) as tzkey:
                 keydict = valuestodict(tzkey)
 
@@ -282,7 +279,7 @@ class tzwinlocal(tzwinbase):
             self._dst_abbr = keydict["DaylightName"]
 
             try:
-                tzkeyname = text_type('{kn}\\{sn}').format(kn=TZKEYNAME,
+                tzkeyname = '{kn}\\{sn}'.format(kn=TZKEYNAME,
                                                           sn=self._std_abbr)
                 with winreg.OpenKey(handle, tzkeyname) as tzkey:
                     _keydict = valuestodict(tzkey)

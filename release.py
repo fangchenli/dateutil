@@ -18,7 +18,7 @@ def cli():
 def build():
     DIST_PATH = 'dist'
     if os.path.exists(DIST_PATH) and os.listdir(DIST_PATH):
-        if click.confirm('{} is not empty - delete contents?'.format(DIST_PATH)):
+        if click.confirm(f'{DIST_PATH} is not empty - delete contents?'):
             shutil.rmtree(DIST_PATH)
             os.makedirs(DIST_PATH)
         else:
@@ -68,7 +68,7 @@ def upload(passfile, release):
         if dist_file.endswith('.asc'):
             continue
         if dist_file + '.asc' not in dist_files:
-            raise ValueError('Missing signature file for: {}'.format(dist_file))
+            raise ValueError(f'Missing signature file for: {dist_file}')
 
     args = ['twine', 'upload', '-r', repository] + dist_files
 

@@ -1,4 +1,4 @@
-name: PyPy
+name: CI
 
 on:
   push:
@@ -9,22 +9,23 @@ on:
       - master
 
 jobs:
-  test:
+  Test:
     strategy:
       matrix:
-        python-version: [pypy2, pypy3]
+        python-version: [3.6, 3.7, 3.8, 3.9, pypy3]
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    env:
-      TOXENV: py
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: python -m pip install -U tox
+        run: | 
+          python -m pip install -U pip setuptools wheel
+          python -m pip install pytest hypothesis pytest-cov freezegun
       - name: Install zic (Windows)
         run: |
           curl https://get.enterprisedb.com/postgresql/postgresql-9.5.21-2-windows-x64-binaries.zip --output $env:GITHUB_WORKSPACE\postgresql9.5.21.zip
@@ -38,13 +39,13 @@ jobs:
       - name: Run updatezinfo.py (Unix)
         run: ./ci_tools/retry.sh python updatezinfo.py
         if: runner.os != 'Windows'
-      - name: Run tox
-        run: python -m tox
-      - name: Generate coverage.xml
-        run: python -m tox -e coverage
-      - name: Report coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./.tox/coverage.xml
-          name: ${{ matrix.os }}:${{ matrix.python-version }}
-          fail_ci_if_error: true
+      - name: Instal Dateutil
+        run: python -m pip install .
+      - name: Run Tests
+        run: python -m pytest dateutil
+      # - name: Report coverage to Codecov
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     file: ./.tox/coverage.xml
+      #     name: ${{ matrix.os }}:${{ matrix.python-version }}
+      #     fail_ci_if_error: true
