@@ -16,8 +16,8 @@ def pytest_collection_modifyitems(items):
 
         # Need to query the args because conditional xfail tests still have
         # the xfail mark even if they are not expected to fail
-        if marker and (not marker.args or marker.args[0]):
-            item.add_marker(pytest.mark.no_cover)
+        # if marker and (not marker.args or marker.args[0]):
+        #     item.add_marker(pytest.mark.no_cover)
 
 
 def set_tzpath():
